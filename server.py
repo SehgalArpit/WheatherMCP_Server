@@ -1,22 +1,22 @@
 from typing import Any
 import httpx
+from fastapi import FastAPI
 from mcp.server.fastmcp import FastMCP
 
-mcp = FastMCP("weather")
+# Create a FastAPI app
+app = FastAPI()
+
+# Pass FastAPI app to MCP
+mcp = FastMCP("weather", app=app)
 
 OPENWEATHER_API_KEY = "e5062b065322673e8aca4ea1367abb9b"
 OPENWEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
-USER_AGENT = "ZykrrWeatherBot/1.0 (your_email@example.com)"  # Update this
+USER_AGENT = "ZykrrWeatherBot/1.0 (your_email@example.com)"  # Replace email
 
 async def fetch_weather_data(city: str) -> dict[str, Any] | None:
-    headers = {
-        "User-Agent": USER_AGENT
-    }
-    params = {
-        "q": city,
-        "appid": OPENWEATHER_API_KEY,
-        "units": "metric"
-    }
+    headers = {"User-Agent": USER_AGENT}
+    params = {"q": city, "appid": OPENWEATHER_API_KEY, "units": "metric"}
+
     async with httpx.AsyncClient() as client:
         try:
             response = await client.get(OPENWEATHER_BASE_URL, headers=headers, params=params, timeout=15)
@@ -28,6 +28,7 @@ async def fetch_weather_data(city: str) -> dict[str, Any] | None:
 @mcp.tool()
 async def get_temperature_alert(city: str) -> str:
     data = await fetch_weather_data(city)
+
     if not data or "main" not in data:
         return "Unable to fetch weather data."
 
@@ -50,8 +51,3 @@ Feels Like: {feels_like}°C
 Humidity: {humidity}%
 Condition: {condition}
 """
-
-# ✅ This is the actual ASGI app Uvicorn can run
-app = mcp.asgi()
-
-
