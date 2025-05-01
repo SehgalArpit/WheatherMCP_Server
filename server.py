@@ -9,7 +9,6 @@ OPENWEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
 USER_AGENT = "ZykrrWeatherBot/1.0 (your_email@example.com)"  # Customize this
 
 async def fetch_weather_data(city: str) -> dict[str, Any] | None:
-    """Fetch weather data for an Indian city."""
     headers = {
         "User-Agent": USER_AGENT
     }
@@ -25,18 +24,10 @@ async def fetch_weather_data(city: str) -> dict[str, Any] | None:
             return response.json()
         except Exception:
             return None
-        
 
 @mcp.tool()
 async def get_temperature_alert(city: str) -> str:
-    """Get temperature alert for an Indian city.
-
-    Args:
-        city: Name of the city (e.g., Delhi, Mumbai, Chennai)
-        
-    """
     data = await fetch_weather_data(city)
-
     if not data or "main" not in data:
         return "Unable to fetch weather data."
 
@@ -45,7 +36,6 @@ async def get_temperature_alert(city: str) -> str:
     humidity = data["main"].get("humidity", "N/A")
     condition = data["weather"][0]["description"].capitalize()
 
-    # Define a simple alert threshold (e.g., extreme heat > 40°C)
     if temp >= 40:
         alert = f"🔥 Heat Alert in {city}!"
     elif temp <= 5:
@@ -61,6 +51,8 @@ Humidity: {humidity}%
 Condition: {condition}
 """
 
-if __name__ == "__main__":
-    import uvicorn
-    mcp.run(transport="http", host="0.0.0.0", port=8000)
+# This is the FastAPI app that Render needs to serve
+app = mcp.app
+
+# Do NOT include mcp.run(...) here
+
