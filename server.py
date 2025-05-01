@@ -6,7 +6,7 @@ mcp = FastMCP("weather")
 
 OPENWEATHER_API_KEY = "e5062b065322673e8aca4ea1367abb9b"
 OPENWEATHER_BASE_URL = "https://api.openweathermap.org/data/2.5/weather"
-USER_AGENT = "ZykrrWeatherBot/1.0 (your_email@example.com)"  # Customize this
+USER_AGENT = "ZykrrWeatherBot/1.0 (your_email@example.com)"  # Update this
 
 async def fetch_weather_data(city: str) -> dict[str, Any] | None:
     headers = {
@@ -51,8 +51,7 @@ Humidity: {humidity}%
 Condition: {condition}
 """
 
-# This is the FastAPI app that Render needs to serve
-app = mcp.app
+# ✅ This is the actual ASGI app Uvicorn can run
+app = mcp.asgi()
 
-# Do NOT include mcp.run(...) here
 
